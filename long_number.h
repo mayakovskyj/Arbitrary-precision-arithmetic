@@ -25,7 +25,7 @@ public:
 	//Ha-ha, no ha-ha :|
 	long_number karatsuba(long_number& other);
 	long_number toom3wayMultiplication(long_number& other);
-	long_number toomInverse(long_number& other);
+//	long_number toomInverse(long_number& other);
 	void theNumber()const;
 	~long_number();
 };
