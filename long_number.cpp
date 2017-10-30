@@ -140,16 +140,17 @@ const long_number long_number::operator+(const long_number & other) const
 			y.number.push_back(0);
 
 		for (int i = 0; i < n; i++) {
-			int t = (x).number[i] + y.number[i] + k;
+			int t = x.number[i] + y.number[i] + k;
 			(*result).number[i] = t % 10;
 			k = t / 10;
 		}
+		(*result).number[n] += k;
 		int i = n + 1;
 		while ((*result).number[i] == 0 && i != 0) {
 			(*result).number.pop_back();
 			i--;
 		}
-	//if ((*result).number[n] == 0) (*result).number.pop_back();
+
 	return (*result);
 }
 
@@ -188,8 +189,7 @@ const long_number long_number::operator-(const long_number & other) const
 	for (int i = 0; i <= n+1; ++i)
 		s += '0';
 	long_number *result = new long_number(s);
-	/*long_number x = (*this);
-	long_number y = (*&other);*/
+
 	if (x.number.size() < y.number.size())
 		while (x.number.size() != y.number.size())
 			x.number.push_back(0);
@@ -209,7 +209,7 @@ const long_number long_number::operator-(const long_number & other) const
 		i--;
 	}
 
-	//Ïðè â³äí³ìàííÿ á³ëüøîãî ÷èñëà ç ìåíøîãî, çíàê ïåðøî¿ öèôðè â³äïîâ³ä³(îñòàííüîãî ÷èñëà âåêòîðó) çì³íþºòüñÿ íà "-"
+	//ÐŸÑ€Ð¸ Ð²Ñ–Ð´Ð½Ñ–Ð¼Ð°Ð½Ð½Ñ Ð±Ñ–Ð»ÑŒÑˆÐ¾Ð³Ð¾ Ñ‡Ð¸ÑÐ»Ð° Ð· Ð¼ÐµÐ½ÑˆÐ¾Ð³Ð¾, Ð·Ð½Ð°Ðº Ð¿ÐµÑ€ÑˆÐ¾Ñ— Ñ†Ð¸Ñ„Ñ€Ð¸ Ð²Ñ–Ð´Ð¿Ð¾Ð²Ñ–Ð´Ñ–(Ð¾ÑÑ‚Ð°Ð½Ð½ÑŒÐ¾Ð³Ð¾ Ñ‡Ð¸ÑÐ»Ð° Ð²ÐµÐºÑ‚Ð¾Ñ€Ñƒ) Ð·Ð¼Ñ–Ð½ÑŽÑ”Ñ‚ÑŒÑÑ Ð½Ð° "-"
 	if (isPositive == false) (*result).number[(*result).number.size() - 1] *= -1;
 	return (*result);
 }
@@ -240,13 +240,8 @@ long_number & long_number::operator=(const long_number & right)
 long_number long_number::karatsuba(long_number & other)
 {
 	int length = max(number.size(), other.number.size());
-	if (length <= 14) {
-		(*this).theNumber();
-		other.theNumber();
-		long_number res = (*this)*other;
-		res.theNumber();
-		return res;
-	}
+	if (length <= 9) 
+		return (*this)*other;
 
 	int m = other.number.size();
 	int n = (*this).number.size();
@@ -289,8 +284,8 @@ long_number long_number::karatsuba(long_number & other)
 long_number long_number::toom3wayMultiplication(long_number & other)
 {
 	int length = max(number.size(), other.number.size());
-	/*	if (length <= 9)
-	return (*this)*other;*/
+	if (length <= 9)
+		return (*this)*other;
 
 	long_number x = (*this);
 	long_number y = (*&other);
@@ -316,8 +311,6 @@ long_number long_number::toom3wayMultiplication(long_number & other)
 				y.number.push_back(0);
 			}
 
-	(*this).theNumber();
-	other.theNumber();
 	length = x.number.size();
 	int k = length / 3;
 
@@ -337,10 +330,10 @@ long_number long_number::toom3wayMultiplication(long_number & other)
 	long_number x_in_3("3");
 	long_number x_in_4("4");
 	W0 = x0*y0;
-	W1 = (x2 + x1 + x0)*(y2 + y1 + y0);
-	W2 = (x_in_2*x_in_2*x2 + x_in_2*x1 + x0)*(x_in_2*x_in_2*y2 + x_in_2*y2 + y0);
-	W3 = (x_in_3*x_in_3*x2 + x_in_3*x1 + x0)*(x_in_3*x_in_3*y2 + x_in_3*y2 + y0);
-	W4 = (x_in_4*x_in_4*x2 + x_in_4*x1 + x0)*(x_in_4*x_in_4*y2 + x_in_4*y2 + y0);
+	W1 = (x2 + x1 + x0) * (y2 + y1 + y0);
+	W2 = (x_in_2*x_in_2*x2 + x_in_2*x1 + x0)*(x_in_2*x_in_2*y2 + x_in_2*y1 + y0);
+	W3 = (x_in_3*x_in_3*x2 + x_in_3*x1 + x0)*(x_in_3*x_in_3*y2 + x_in_3*y1 + y0);
+	W4 = (x_in_4*x_in_4*x2 + x_in_4*x1 + x0)*(x_in_4*x_in_4*y2 + x_in_4*y1 + y0);
 
 	// Interpolation
 	// 1  0  0   0   0    W0
@@ -353,10 +346,10 @@ long_number long_number::toom3wayMultiplication(long_number & other)
 	W2 = W2 - W0;
 	W3 = W3 - W0;
 	W4 = W4 - W0;
-	/*
+
 	W2 = W2 - x_in_2*W1;
 	W3 = W3 - x_in_3*W1;
-	W4 = W4 - x_in_4*W4;
+	W4 = W4 - x_in_4*W1;
 
 	// 1  0  0   0   0    W0
 	// 0  1  1   1   1    W1
@@ -385,8 +378,8 @@ long_number long_number::toom3wayMultiplication(long_number & other)
 	// 0  0  0   1   6    W3
 	// 0  0  0   0   1    W4
 
-	W3 = W3 - W4 * long_number("6");
-	W2 = W2 - W4 * long_number("7");
+	W3 = W3 - (W4 * long_number("6"));
+	W2 = W2 - (W4 * long_number("7"));
 	W1 = W1 - W4;
 
 	// 1  0  0   0   0	  W0
@@ -395,7 +388,7 @@ long_number long_number::toom3wayMultiplication(long_number & other)
 	// 0  0  0   1   0    W3
 	// 0  0  0   0   1    W4
 
-	W2 = W2 - W3 * x_in_3;
+	W2 = W2 - (W3 * x_in_3);
 	W1 = W1 - W3;
 
 	W1 = W1 - W2;
@@ -406,7 +399,7 @@ long_number long_number::toom3wayMultiplication(long_number & other)
 	W3.number.insert(W3.number.begin(), 3 * k, 0);
 	W2.number.insert(W2.number.begin(), 2 * k, 0);
 	W1.number.insert(W1.number.begin(), k, 0);
-	*/
+
 	long_number result;
 	result = W4 + W3 + W2 + W1 + W0;
 	return result;
@@ -417,9 +410,6 @@ void long_number::theNumber()const
 	for (int i = number.size() - 1; i >= 0; i--)
 		cout << number[i];
 	cout << endl;
-	/*	s += i + 48;
-	reverse(s.begin(), s.end());
-	return s;*/
 }
 
 
