@@ -656,3 +656,122 @@ void long_number::FFT(vector<complex<double>>& a, bool invert)
 			w *= wn;
 		}
 }
+
+
+long_number long_number::operator - () const {
+	long_number nw, old;
+	old = *this;
+	nw = old;
+	nw.number[nw.number.size() - 1] = -number[nw.number.size() - 1];
+	return nw;
+}
+
+long_number long_number::operator + () const {
+	return *this;
+}
+
+bool long_number::is_prime_Solovey_Strassen()
+{
+	long_number one("1"), two("2"), p = (*this);
+
+	if (p == two) return true;
+	if (p == one || p.number[0] % 2 == 0) return false;
+	if (two > p) return false;
+
+	for (int i = 0; i < 3; i++)
+	{
+		long_number a,j, jac;
+		a = p.random_number();
+
+		if (a.gcd(p) > one) return false;
+		j = a.power(a, ((p - one) / two));
+
+		jac = a.jacobi(p);
+
+		if (!((j - jac) % p == long_number("0"))) return false;
+	}
+	return true;
+}
+
+long_number long_number::gcd(const long_number & other)const
+{
+	long_number a = (*this), null("0");
+	return other == null ? a : other.gcd(a % other);
+}
+
+long_number long_number::random_number()
+{
+	vector<int> a;
+	bool random = true;
+	while (random)
+	{
+		a.clear();
+		for (int i = 0; i < (*this).number.size(); i++)
+		{
+			if (i == 0)
+			{
+				int b = rand() % (*this).number[0] + 1;
+				a.insert(a.begin(), b);
+			}
+			else
+			{
+				int c = rand() % 10;
+				while (c == 0) c = rand() % 10;
+				a.insert(a.begin(), c);
+			}
+		}
+		if (*this > long_number(a))
+			random = false;
+	}
+	while (a.size() > 1 && a.back() == 0) a.pop_back();
+	if (a[0] < 2 && a.size() == 1) {
+		a[0] = 2; return a;
+	}
+
+	if (a.size() == 2) return a;
+	return long_number(a[0] + a[1]);
+}
+
+long_number long_number::power(const long_number &number, const long_number p)
+{
+	long_number a("1");
+	if (p == 0) return 1;
+	long_number i = ("1");
+	while (!(i > p)) {
+		a = a.strassen(number);
+		i = i + 1;
+	}
+	return a;
+}
+
+long_number long_number::jacobi(long_number & other)const
+{
+	long_number a, g, null("0"), one("1"), two("2");
+	a = *this;
+	if (!(a.gcd(other) == long_number("1"))) return long_number("0");
+
+	assert(other.number[0] % 2 == 1);
+	if (a > other || a == other) a = a % other; /* по правилу 4 */
+	if (a == null) return null; /* по определению 1 */
+	if (a == one)  return one; /* по правилу 1 */
+	if (null > a)
+		if ((other - one) / two % two == null)
+			return (-a).jacobi(other);
+		else
+			return -(-a).jacobi(other);
+	if (a % two == null) /* a четно */
+		if (((other.toom3wayMultiplication(other) - one) / 8) % two == null)
+			return +(a / 2).jacobi(other);
+		else
+			return -(a / 2).jacobi(other); /* по правилам 3 и 2 */
+	g = a.gcd(other);
+	assert(a.number[0] % 2 == 1); /* это обеспечивается проверкой (a % 2 == 0) */
+	if (g == a) /* b делится на a */
+		return null; /* по правилу 5 */
+	else if (!(g == one))
+		return g.jacobi(other)*(a / g).jacobi(other); /* по правилу 2 */
+	else if (((a - one).toom3wayMultiplication(other - one) / 4) % two == null)
+		return +other.jacobi(a); /* по правилу 6a */
+	else
+		return -other.jacobi(a); /* по правилу 6b */
+}
