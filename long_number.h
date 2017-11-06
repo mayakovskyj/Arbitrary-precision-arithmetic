@@ -35,7 +35,9 @@ public:
 	long_number& operator=(const long_number& right);
 	bool operator>(const long_number& other)const;
 	bool operator==(const long_number& other)const;
-
+	long_number operator - () const;
+	long_number operator + () const;
+	
 	//Multiplication algorithms 
 	long_number karatsuba(long_number& other);
 	long_number toom3wayMultiplication(long_number& other);
@@ -45,6 +47,13 @@ public:
 	long_number strassen(long_number& other);
 		void FFT(vector<complex<double>> &a, bool invert);
 
+	//Algorithms for prime numbers
+	bool is_prime_Solovey_Strassen();
+		long_number gcd(const long_number &other)const;
+		long_number random_number();
+		long_number power(const long_number &number, const long_number p);
+		long_number jacobi(long_number &other)const;
+	
 	void theNumber()const;
 	~long_number();
 };
