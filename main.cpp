@@ -18,7 +18,10 @@ int main() {
 	toom.theNumber();
 	shoen.theNumber();
 	strass.theNumber();
-
+	
+	long_number x("19");
+	cout << x.is_prime_Solovey_Strassen() << endl << endl;
+	
 	system("pause");
 	return 0;
 }
